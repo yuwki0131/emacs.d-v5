@@ -35,6 +35,7 @@
 
 ;; Load modular configs (ported from v4)
 (add-to-list 'load-path (expand-file-name "alter" user-emacs-directory))
+(require 'xolor)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load custom-file 'noerror 'nomessage))
