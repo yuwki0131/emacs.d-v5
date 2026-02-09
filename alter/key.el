@@ -13,6 +13,15 @@
 (global-unset-key "\M-o")
 (global-unset-key "\C-r")
 
+;; Provide Help alternative since C-h is rebound
+;; F1 is generally safe across GUI/TTY
+(global-set-key (kbd "<f1>") 'help-command)
+;; Optional: C-? as another help access (may map to DEL on some terms)
+(ignore-errors (global-set-key (kbd "C-?") 'help-command))
+
+;; Use bind-key to namespace C-z prefix
+(require 'bind-key)
+
 ;; Alt defaults
 (global-set-key "\C-x\C-f" 'counsel-find-file)
 (global-set-key "\C-s"     'swiper-isearch)
@@ -26,13 +35,25 @@
 (global-set-key "\C-h" 'delete-backward-char)
 (global-set-key "\M-h" 'backward-kill-word)
 
-;; Functional
-(global-set-key "\C-z\C-r" 'replace-string)
-(global-set-key "\C-z\C-p" 'package-install)
-(global-set-key "\C-zd"    'vc-diff)
-(global-set-key "\C-z\C-d" 'vc-root-diff)
-(global-set-key "\C-z\C-s" 'counsel-git-grep)
-(global-set-key "\C-z\C-a" 'counsel-ag)
+;; Functional under C-z namespace
+(bind-keys
+ :prefix-map my/cz-map
+ :prefix "C-z"
+ ("C-r" . replace-string)
+ ("C-p" . package-install)
+ ("d"   . vc-diff)
+ ("C-d" . vc-root-diff)
+ ("C-s" . counsel-git-grep)
+ ("C-a" . counsel-ag))
+
+;; project.el shortcuts under C-z p
+(require 'project)
+(bind-keys
+ :prefix-map my/cz-project-map
+ :prefix "C-z p"
+ ("f" . project-find-file)
+ ("p" . project-switch-project)
+ ("g" . project-find-regexp))
 
 ;; Moving
 (global-set-key "\C-e\C-c" 'shell)
