@@ -1,0 +1,37 @@
+# Emacs package/build artifacts
+/elpa/
+/eln-cache/
+/auto-save-list/
+/transient/
+/straight/
+/var/
+/url/
+/eshell/
+/tramp/
+
+# State files (per-user, not for sharing)
+/recentf
+/bookmarks
+/history      # savehist-mode default
+/places       # save-place-mode default
+/network-security.data
+
+# Byte-compiled files
+/*.elc
+/alter/*.elc
+
+# Optional Customize file if used
+/custom.el
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# Emacs backups/auto-saves/locks
+*~
+\#*\#
+.#*
+
+# Tooling (optional)
+.cask/
+projectile-bookmarks.eld
