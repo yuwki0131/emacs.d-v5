@@ -4,6 +4,83 @@
 ;;; Code:
 
 (eval-when-compile (require 'use-package))
+(require 'seq)
+(require 'cl-lib)
+
+(defvar v5/force-disable-icons nil 
+  "If non-nil, force-disable icons to avoid tofu.")
+
+(defun v5/icon-sample-codes ()
+  "Return a small set of common Nerd icon codepoints."
+  '(#xF101 #xF0A0 #xF120 #xF0E7 #xEA60))
+
+(defun v5/icon-glyphs-displayable-p ()
+  "Return non-nil if sample PUA glyphs render."
+  (when (display-graphic-p)
+    (cl-every (lambda (cp) (char-displayable-p (decode-char 'ucs cp)))
+              (v5/icon-sample-codes))))
+
+
+;; Icons for modeline and UI
+(use-package all-the-icons
+  :if (display-graphic-p)
+  :defer t)
+
+;; Nerd icons for doom-modeline (preferred by recent versions)
+(defvar nerd-icons-font-family "Symbols Nerd Font Mono")
+(use-package nerd-icons
+  :if (display-graphic-p)
+  :demand t)
+
+(defun v5/icon-fonts-installed-p ()
+  "Return non-nil if any icon font family seems available."
+  (let* ((families (font-family-list))
+         (names '("Symbols Nerd Font Mono" "Symbols Nerd Font"
+                  "all-the-icons" "Material Icons" "FontAwesome"
+                  "octicons" "Weather Icons" "File Icons")))
+    (seq-some (lambda (n) (member n families)) names)))
+
+(defun v5/ensure-icon-fonts (&optional _frame)
+  "Ensure icon fonts are installed for the current GUI frame."
+  (when (display-graphic-p)
+    (unless (v5/icon-fonts-installed-p)
+      ;; Try installing Nerd and All-the-icons fonts
+      (ignore-errors (when (require 'nerd-icons nil t)
+                       (nerd-icons-install-fonts t)))
+      (ignore-errors (when (require 'all-the-icons nil t)
+                       (all-the-icons-install-fonts t)))
+      ;; Refresh font cache if available
+      (when (executable-find "fc-cache")
+        (ignore-errors (call-process "fc-cache" nil nil nil "-f" "-v"))))))
+
+;; Run once at startup and also when creating first GUI frame (daemon use)
+(add-hook 'emacs-startup-hook #'v5/ensure-icon-fonts)
+(add-hook 'after-make-frame-functions #'v5/ensure-icon-fonts)
+
+(defun v5/diagnose-icons ()
+  "Report icon/emoji font availability."
+  (interactive)
+  (message "Icons installed: %s, Emoji present: %s"
+           (if (v5/icon-fonts-installed-p) 'yes 'no)
+           (member "Noto Color Emoji" (font-family-list))))
+
+;; Toggle icons after fonts become available
+(defun v5/enable-icons-if-ready (&optional _frame)
+  (when (and (display-graphic-p)
+             (v5/icon-fonts-installed-p)
+             (v5/icon-glyphs-displayable-p)
+             (boundp 'doom-modeline-icon))
+    (setq doom-modeline-icon t)
+    ;; set nerd-icons font family to a sane default if present
+    (when (boundp 'nerd-icons-font-family)
+      (let ((fam (or (car (seq-filter (lambda (n) (member n (font-family-list)))
+                                      '("Symbols Nerd Font Mono" "Symbols Nerd Font")))
+                     nerd-icons-font-family)))
+        (setq nerd-icons-font-family fam)))
+    (when (fboundp 'doom-modeline-refresh) (doom-modeline-refresh))))
+
+(add-hook 'emacs-startup-hook #'v5/enable-icons-if-ready)
+(add-hook 'after-make-frame-functions #'v5/enable-icons-if-ready)
 
 ;; counsel/ivy (M-x など)
 (use-package counsel
@@ -48,10 +125,13 @@
 
 ;; Doom modeline
 (use-package doom-modeline
+  :after nerd-icons
   :hook (after-init . doom-modeline-mode)
   :config
   (setq doom-modeline-height 22
-        doom-modeline-lsp t)
+        doom-modeline-lsp t
+        doom-modeline-icon nil
+        doom-modeline-unicode-fallback t)
   (doom-modeline-def-modeline 'my-simple-line
     '(bar input-method matches remote-host selection-info
           misc-info buffer-encoding process vcs buffer-info)
