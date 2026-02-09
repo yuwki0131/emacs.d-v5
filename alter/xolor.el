@@ -64,9 +64,9 @@
 ;; Mode-line
 (custom-set-faces
  `(mode-line
-   ((t (:background ,v/focus :foreground nil :box nil))))
+   ((t (:background ,v/focus :foreground ,v/foreground :box nil))))
  `(mode-line-inactive
-   ((t (:background ,v/background :foreground nil
+   ((t (:background ,v/background :foreground ,v/out
         :box (:line-width 1 :color ,v/focus :style nil))))))
 
 ;; Header-line
@@ -113,4 +113,3 @@
 
 (provide 'xolor)
 ;;; xolor.el ends here
-

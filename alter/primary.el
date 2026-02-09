@@ -30,7 +30,9 @@
 (defvar nerd-icons-font-family "Symbols Nerd Font Mono")
 (use-package nerd-icons
   :if (display-graphic-p)
-  :demand t)
+  :demand t
+  :config
+  (setq nerd-icons-font-family (or nerd-icons-font-family "Symbols Nerd Font Mono")))
 
 (defun v5/icon-fonts-installed-p ()
   "Return non-nil if any icon font family seems available."
@@ -119,26 +121,57 @@
         company-tooltip-limit 20
         company-show-quick-access t))
 
-;; Headerline: full path in header line
+;; Headerline: show path only for real files to avoid nil errors
 (use-package path-headerline-mode
-  :config (path-headerline-mode +1))
+  :commands path-headerline-mode
+  :init
+  (defun v5/enable-path-headerline-if-file ()
+    (when buffer-file-name
+      (path-headerline-mode +1)))
+  :hook ((find-file . v5/enable-path-headerline-if-file))
+  :config
+  ;; Be explicit: disable in non-file/special buffers
+  (add-hook 'after-change-major-mode-hook
+            (lambda ()
+              (unless buffer-file-name
+                (when (bound-and-true-p path-headerline-mode)
+                  (path-headerline-mode -1)))))
+  (with-eval-after-load 'dashboard
+    (add-hook 'dashboard-mode-hook
+              (lambda ()
+                (when (bound-and-true-p path-headerline-mode)
+                  (path-headerline-mode -1))))))
 
 ;; Doom modeline
 (use-package doom-modeline
   :after nerd-icons
-  :hook (after-init . doom-modeline-mode)
-  :config
+  :init
   (setq doom-modeline-height 22
         doom-modeline-lsp t
         doom-modeline-icon nil
-        doom-modeline-unicode-fallback t)
-  (doom-modeline-def-modeline 'my-simple-line
-    '(bar input-method matches remote-host selection-info
-          misc-info buffer-encoding process vcs buffer-info)
-    '())
-  (defun v5/setup-custom-doom-modeline ()
-    (doom-modeline-set-modeline 'my-simple-line 'default))
-  (add-hook 'doom-modeline-mode-hook #'v5/setup-custom-doom-modeline))
+        doom-modeline-unicode-fallback t
+        doom-modeline-buffer-file-name-style 'truncate-with-project
+        doom-modeline-github nil
+        doom-modeline-github-interval 0
+        doom-modeline-buffer-encoding nil
+        doom-modeline-modal-icon nil
+        doom-modeline-env-version nil
+        doom-modeline-mu4e nil
+        doom-modeline-gnus nil
+        doom-modeline-irc nil
+        doom-modeline-battery nil
+        doom-modeline-time nil
+        doom-modeline-checker-simple-format nil
+        doom-modeline-vcs-max-length 12)
+  :config
+  ;; Guard battery updates when icon toggles, to avoid stringp nil errors
+  (defun v5/doom-battery-guard (orig &rest args)
+    (when (and (boundp 'doom-modeline-battery)
+               doom-modeline-battery
+               (ignore-errors (battery)))
+      (apply orig args)))
+  (advice-add 'doom-modeline-update-battery-status :around #'v5/doom-battery-guard)
+  :hook (after-init . doom-modeline-mode))
 
 ;; Magit
 (use-package magit)

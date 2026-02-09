@@ -27,7 +27,8 @@
   (ignore-errors (package-install 'use-package)))
 
 (eval-when-compile (require 'use-package))
-(setq use-package-always-ensure t)
+(setq use-package-always-ensure t
+      use-package-verbose t)
 
 ;; Example: using package-vc via use-package
 ;; (use-package some-lib
@@ -37,6 +38,7 @@
 (add-to-list 'load-path (expand-file-name "alter" user-emacs-directory))
 
 (require 'font)
+(require 'safety)
 (require 'xolor)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
@@ -44,7 +46,8 @@
 (require 'primary)
 (require 'secondary)
 (require 'lang)
-(require 'key)
+(
+require 'key)
 
 (provide 'init)
 ;;; init.el ends here
@@ -60,3 +63,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
