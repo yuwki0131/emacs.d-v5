@@ -116,6 +116,19 @@
   (setq vertico-resize t
         vertico-count 20))
 
+;; Vertico-directory: ファイル名/パス編集中の削除挙動を改善
+;; - Backspace/DEL/C-h で単語（ディレクトリ要素）単位で削除
+;; - rfn-eshadow と連携してパスを整える
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  :bind (:map vertico-map
+              ("<backspace>" . vertico-directory-delete-word)
+              ("DEL"         . vertico-directory-delete-word)
+              ("C-h"         . vertico-directory-delete-word)
+              ("M-DEL"       . vertico-directory-delete-word))
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+
 ;; Marginalia: minibuffer annotations
 (use-package marginalia
   :bind (:map minibuffer-local-map
