@@ -12,8 +12,10 @@
 # State files (per-user, not for sharing)
 /recentf
 /bookmarks
-/history      # savehist-mode default
-/places       # save-place-mode default
+# savehist-mode default history file
+/history
+# save-place-mode default places file
+/places
 /network-security.data
 
 # Byte-compiled files

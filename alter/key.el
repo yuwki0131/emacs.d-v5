@@ -23,9 +23,9 @@
 (require 'bind-key)
 
 ;; Alt defaults
-(global-set-key "\C-x\C-f" 'counsel-find-file)
-(global-set-key "\C-s"     'swiper-isearch)
-(global-set-key "\C-r"     'swiper-isearch-backward)
+(global-set-key "\C-x\C-f" 'find-file)
+(global-set-key "\C-s"     'consult-line)
+(global-set-key "\C-r"     'consult-line)
 
 ;; Minimum
 (global-set-key "\M-o" 'other-window)
@@ -43,8 +43,8 @@
  ("C-p" . package-install)
  ("d"   . vc-diff)
  ("C-d" . vc-root-diff)
- ("C-s" . counsel-git-grep)
- ("C-a" . counsel-ag))
+ ("C-s" . consult-git-grep)
+ ("C-a" . consult-ripgrep))
 
 ;; project.el shortcuts under C-z p
 (require 'project)
@@ -57,7 +57,7 @@
 
 ;; Moving
 (global-set-key "\C-e\C-c" 'shell)
-(global-set-key "\C-e\C-m" 'counsel-switch-buffer)
+(global-set-key "\C-e\C-m" 'consult-buffer)
 (global-set-key "\M-n"     'next-buffer)
 (global-set-key "\C-e\C-f" 'next-buffer)
 (global-set-key "\M-p"     'previous-buffer)
@@ -71,7 +71,7 @@
 (global-set-key "\C-a\C-d" 'duplicate-thing)
 (global-set-key "\C-a\C-r" 'rectangle-mark-mode)
 (global-set-key "\C-a\C-k" 'kill-this-buffer)
-(global-set-key "\C-a\C-y" 'counsel-yank-pop)
+(global-set-key "\C-a\C-y" 'consult-yank-pop)
 (global-set-key "\C-a\C-q" 'quoted-insert)
 
 ;; Window change

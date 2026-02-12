@@ -1,11 +1,37 @@
 ;;; primary.el --- Packages (primary) -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;;  Core packages via package.el + package-vc
+;;;  Vertico + Consult + Orderless + Marginalia + Embark
 ;;; Code:
 
 (eval-when-compile (require 'use-package))
 (require 'seq)
 (require 'cl-lib)
+
+
+;; Ensure core completion packages are installed (refresh archives if needed)
+(when (and (not noninteractive) (>= emacs-major-version 29))
+  (require 'package-vc nil t))
+
+(defun v5/ensure-package (pkg &optional vc-url)
+  "Install PKG if missing. If MELPA index is stale, refresh. Fallback to VC-URL when available."
+  (unless (package-installed-p pkg)
+    (condition-case _
+        (progn
+          (package-refresh-contents)
+          (package-install pkg))
+      (error
+       (when (and vc-url (featurep 'package-vc))
+         (ignore-errors
+           (package-vc-install vc-url)))))))
+
+(dolist (it '((vertico . "https://github.com/minad/vertico")
+              (consult . "https://github.com/minad/consult")
+              (marginalia . "https://github.com/minad/marginalia")
+              (orderless . "https://github.com/oantolin/orderless")
+              (embark . "https://github.com/oantolin/embark")
+              (embark-consult . nil)))
+  (v5/ensure-package (car it) (cdr it)))
 
 (defvar v5/force-disable-icons nil 
   "If non-nil, force-disable icons to avoid tofu.")
@@ -19,7 +45,6 @@
   (when (display-graphic-p)
     (cl-every (lambda (cp) (char-displayable-p (decode-char 'ucs cp)))
               (v5/icon-sample-codes))))
-
 
 ;; Icons for modeline and UI
 (use-package all-the-icons
@@ -84,18 +109,12 @@
 (add-hook 'emacs-startup-hook #'v5/enable-icons-if-ready)
 (add-hook 'after-make-frame-functions #'v5/enable-icons-if-ready)
 
-;; counsel/ivy (M-x など)
-(use-package counsel
-  :bind (("M-x" . counsel-M-x))
-  :config
-  (setq ivy-height 30
-        counsel-preselect-current-file t
-        counsel-yank-pop-preselect-last t)
-  ;; Ignore ./ and ../ in counsel-find-file
-  (defvar counsel-find-file-ignore-regexp (regexp-opt '("./" "../"))))
-
-;; swiper for isearch-like incremental search used by keybindings
-(use-package swiper)
+;; Vertico (minibuffer UI)
+(use-package vertico
+  :init
+  (vertico-mode 1)
+  (setq vertico-resize t
+        vertico-count 20))
 
 ;; Marginalia: minibuffer annotations
 (use-package marginalia
@@ -108,7 +127,32 @@
 (use-package orderless
   :custom
   (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
   (completion-category-overrides '((file (styles basic partial-completion)))))
+
+;; Consult: commands on top of completion
+(use-package consult
+  :init
+  ;; register/preview tweaks
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
+  (advice-add #'register-preview :override #'consult-register-window)
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+  :config
+  (setq consult-narrow-key (kbd ">")))
+
+;; Embark: contextual actions
+(use-package embark
+  :bind (("C-." . embark-act)
+         ("C-;" . embark-dwim)
+         ("C-h B" . embark-bindings))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command))
+
+(use-package embark-consult
+  :after (embark consult)
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; Company: auto-completion
 (use-package company

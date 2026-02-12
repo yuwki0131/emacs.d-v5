@@ -40,14 +40,15 @@
 (require 'font)
 (require 'safety)
 (require 'xolor)
+(require 'builtin)
+(require 'appearance)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load custom-file 'noerror 'nomessage))
 (require 'primary)
 (require 'secondary)
 (require 'lang)
-(
-require 'key)
+(require 'key)
 
 (provide 'init)
 ;;; init.el ends here
@@ -63,4 +64,3 @@ require 'key)
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
