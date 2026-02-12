@@ -1,5 +1,4 @@
-emacs.d-v5
-================================
+# emacs.d-v5
 
 概要
 - 目的: v4 を踏襲しつつ、よりモダンで扱いやすい Emacs 構成を提供。
@@ -27,10 +26,10 @@ emacs.d-v5
 - それ以前: `emacs -q --load /home/yuwki0131/myconfig/emacs.d-v5/init.el`
 
 
-NixOS 設定（LSP/フォントの推奨）
---------------------------------
+## NixOS 設定（LSP/フォントの推奨）
 この v5 は「実行ファイルが PATH にあれば対象モードで Eglot を起動」します。以下を `configuration.nix` に追記してください。
 
+```nix
 environment.systemPackages = with pkgs; [
   # LSP servers
   yaml-language-server
@@ -61,6 +60,7 @@ fonts = {
 system.activationScripts.updateFontCache.text = ''
   if command -v fc-cache >/dev/null; then fc-cache -f -v || true; fi
 '';
+```
 
 備考
 - `ruby-lsp` はチャンネルによって `ruby-lsp` か `(rubyPackages.ruby-lsp)` で提供されます。
@@ -68,16 +68,18 @@ system.activationScripts.updateFontCache.text = ''
 - `$HOME/.bashrc` などホーム直下のファイルは通常プロジェクト外のため、自動では Eglot を起動しません。必要なら `M-x eglot` で手動接続してください。
 
 
-macOS 準備手順
-----------------
+## macOS 準備手順
 前提: Homebrew 利用（https://brew.sh/）。
 
 1) Emacs の用意（29+ 推奨）
 - `brew install emacs` もしくは GUI が必要なら `brew install --cask emacs`（emacs-plus を使う場合は各自の好みで）。
 
 2) LSP サーバ類
+```bash
 brew install yaml-language-server marksman bash-language-server ruby-lsp pyright basedpyright \
   node typescript typescript-language-server nixd
+brew install vscode-langservers-extracted
+```
 
 補足:
 - JSON 用には `brew install vscode-langservers-extracted`（もしくは Node 環境で `npm i -g vscode-langservers-extracted`）。
@@ -105,4 +107,3 @@ brew install yaml-language-server marksman bash-language-server ruby-lsp pyright
 
 ライセンス
 - このリポジトリの設定ファイルは、特段の明記が無い限り利用者の責任でご自由にお使いください。
-
