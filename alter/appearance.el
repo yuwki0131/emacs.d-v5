@@ -36,6 +36,8 @@
 ;; 対応する括弧のハイライト / 選択の上書き
 (show-paren-mode 1)
 (delete-selection-mode 1)
+;; グローバルにシンタックスハイライトを有効化
+(global-font-lock-mode 1)
 
 (provide 'appearance)
 ;;; appearance.el ends here

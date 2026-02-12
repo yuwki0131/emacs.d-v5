@@ -6,6 +6,12 @@
 
 (eval-when-compile (require 'use-package))
 
+;; Workaround for nix-mode packaging: nix-log.el uses helpers from nix-shell.el
+;; Ensure the native compiler knows about these functions to avoid warnings.
+(autoload 'nix-read-file "nix-shell")
+(autoload 'nix-read-attr "nix-shell")
+(autoload 'nix-read-flake "nix-shell")
+
 ;; -------- Eglot (LSP client) --------
 (use-package eglot
   :commands (eglot eglot-ensure)
@@ -35,7 +41,9 @@
            ((ruby-mode ruby-ts-mode)
             . ("ruby-lsp"))
            ((python-mode python-ts-mode)
-            . ("basedpyright-langserver" "--stdio")))
+            . ("basedpyright-langserver" "--stdio"))
+           ((nix-mode nix-ts-mode)
+            . ("nixd")))
          eglot-server-programs))
 
   ;; If preferred servers are missing, try alternates at runtime
@@ -57,6 +65,8 @@
            (v5/first-exec "pylsp")))
       ((or 'typescript-mode 'typescript-ts-mode 'tsx-ts-mode 'js-ts-mode)
        (v5/first-exec "typescript-language-server"))
+      ((or 'nix-mode 'nix-ts-mode)
+       (or (v5/first-exec "nixd") (v5/first-exec "nil")))
       (_ nil)))
 
   (defun v5/maybe-start-eglot ()
@@ -90,6 +100,15 @@
 
 ;; Bash / Shell
 (add-hook 'sh-mode-hook #'v5/maybe-start-eglot)
+;; Dotfiles でも確実に sh-mode になるように関連付け
+(dolist (rx '("/\\.bashrc\\'" "/\\.bash_profile\\'" "/\\.bash_aliases\\'" "/\\.profile\\'"))
+  (add-to-list 'auto-mode-alist (cons rx 'sh-mode)))
+;; .bashrc 等では bash 方言を既定に
+(add-hook 'sh-mode-hook
+          (lambda ()
+            (when (and buffer-file-name
+                       (string-match-p "/\\.bash\(rc\|_profile\|_aliases\)?\\'" buffer-file-name))
+              (sh-set-shell "bash"))))
 
 ;; Ruby
 (add-hook 'ruby-mode-hook #'v5/maybe-start-eglot)
@@ -107,6 +126,15 @@
 (use-package typescript-mode
   :mode "\\.ts\\'"
   :hook ((typescript-mode . v5/maybe-start-eglot)))
+
+;; Nix language
+(use-package nix-mode
+  :mode "\\.nix\\'"
+  :hook ((nix-mode . v5/maybe-start-eglot)
+         ;; so-long が長行検出で font-lock を無効化した場合に再有効化
+         (nix-mode . (lambda ()
+                       (unless font-lock-mode
+                         (font-lock-mode 1))))))
 
 (provide 'lang)
 ;;; lang.el ends here
