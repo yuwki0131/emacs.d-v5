@@ -23,27 +23,41 @@
   (when (boundp 'read-process-output-max)
     (setq read-process-output-max (* 3 1024 1024)))
   :config
+  (declare-function sh-set-shell "sh-script")
   ;; Helper: pick first existing executable from CANDIDATES
   (defun v5/first-exec (&rest candidates)
     (seq-find #'executable-find candidates))
 
-  ;; Prefer modern servers when available; fall back gracefully
-  (setq eglot-server-programs
+  ;; Prefer modern servers; use alternatives so any available one is used
+(setq eglot-server-programs
         (append
          '(((yaml-mode yaml-ts-mode)
-            . ("yaml-language-server" "--stdio"))
+            . (eglot-alternatives
+               (("yaml-language-server" "--stdio")))))
            ((json-mode json-ts-mode)
-            . ("vscode-json-languageserver" "--stdio"))
+            . (eglot-alternatives
+               (("vscode-json-languageserver" "--stdio")
+                ("vscode-json-languageserver-cli" "--stdio")
+                ("json-languageserver" "--stdio"))))
            ((markdown-mode gfm-mode)
-            . ("marksman" "server"))
+            . (eglot-alternatives
+               (("marksman" "server"))))
            ((sh-mode bash-ts-mode)
-            . ("bash-language-server" "start"))
+            . (eglot-alternatives
+               (("bash-language-server" "start"))))
            ((ruby-mode ruby-ts-mode)
-            . ("ruby-lsp"))
+            . (eglot-alternatives
+               (("ruby-lsp")
+                ("solargraph" "stdio"))))
            ((python-mode python-ts-mode)
-            . ("basedpyright-langserver" "--stdio"))
+            . (eglot-alternatives
+               (("basedpyright-langserver" "--stdio")
+                ("pyright-langserver" "--stdio")
+                ("pylsp"))))
            ((nix-mode nix-ts-mode)
-            . ("nixd")))
+            . (eglot-alternatives
+               (("nixd")
+                ("nil")))))
          eglot-server-programs))
 
   ;; If preferred servers are missing, try alternates at runtime
@@ -77,7 +91,7 @@
              (srv (v5/eglot-choose-server m)))
         (when srv
           (eglot-ensure)))))
-  )
+  
 
 ;; -------- Language modes and hooks --------
 
@@ -100,6 +114,8 @@
 
 ;; Bash / Shell
 (add-hook 'sh-mode-hook #'v5/maybe-start-eglot)
+;; tree-sitter（bash-ts-mode）
+(add-hook 'bash-ts-mode-hook #'v5/maybe-start-eglot)
 ;; Dotfiles でも確実に sh-mode になるように関連付け
 (dolist (rx '("/\\.bashrc\\'" "/\\.bash_profile\\'" "/\\.bash_aliases\\'" "/\\.profile\\'"))
   (add-to-list 'auto-mode-alist (cons rx 'sh-mode)))
@@ -112,9 +128,13 @@
 
 ;; Ruby
 (add-hook 'ruby-mode-hook #'v5/maybe-start-eglot)
+;; tree-sitter（ruby-ts-mode）
+(add-hook 'ruby-ts-mode-hook #'v5/maybe-start-eglot)
 
 ;; Python
 (add-hook 'python-mode-hook #'v5/maybe-start-eglot)
+;; tree-sitter（python-ts-mode）
+(add-hook 'python-ts-mode-hook #'v5/maybe-start-eglot)
 
 ;; TypeScript / TSX / JS (tree-sitter if available)
 (with-eval-after-load 'treesit

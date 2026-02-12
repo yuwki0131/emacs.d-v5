@@ -32,8 +32,23 @@
 (save-place-mode 1)
 (global-auto-revert-mode 1)
 (setq auto-revert-verbose nil)
+;; so-long: 長行での重さ対策。ただし通常ファイルで font-lock が落ちないよう閾値を上げる
+(when (boundp 'so-long-threshold)
+  (setq so-long-threshold 10000))
 (when (fboundp 'global-so-long-mode)
   (global-so-long-mode 1))
+
+;; 何らかの理由で major-mode 切替時に font-lock が無効になっていたら復帰させる
+(add-hook 'after-change-major-mode-hook
+          (lambda ()
+            (unless font-lock-mode
+              (font-lock-mode 1))
+            (when (fboundp 'font-lock-ensure)
+              (ignore-errors (font-lock-ensure)))))
+
+;; 念のため明示的に有効化（環境によっては init 途中で無効化されることがある）
+(setq font-lock-global-modes t)
+(global-font-lock-mode 1)
 
 ;; バックアップ/オートセーブは不要（ユーザ指定）
 (setq auto-save-default nil
