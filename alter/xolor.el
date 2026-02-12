@@ -85,6 +85,39 @@
  `(git-gutter:deleted ((t (:foreground ,v/secondary     :background ,v/secondary))))
  `(git-gutter:modified((t (:foreground ,v/emphasis/weak :background ,v/emphasis/weak)))))
 
+;; line numbers
+(custom-set-faces
+ `(line-number              ((t (:foreground ,v/out))))
+ `(line-number-current-line ((t (:foreground ,v/foreground)))))
+
+;; Vertico/Orderless/Consult/Marginalia/Embark
+(custom-set-faces
+ `(vertico-current        ((t (:background ,v/emphasis/weak :foreground ,v/main))))
+ `(vertico-group-title    ((t (:foreground ,v/out))))
+ `(vertico-group-separator((t (:foreground ,v/out))))
+ `(vertico-directory      ((t (:foreground ,v/main))))
+ `(orderless-match-face-0 ((t (:foreground ,v/main        :weight bold))))
+ `(orderless-match-face-1 ((t (:foreground ,v/secondary   :weight bold))))
+ `(orderless-match-face-2 ((t (:foreground ,v/emphasis    :weight bold))))
+ `(orderless-match-face-3 ((t (:foreground ,v/string-like :weight bold))))
+ `(consult-preview-match  ((t (:background ,v/emphasis/weak))))
+ `(consult-highlight      ((t (:foreground ,v/emphasis    :weight bold))))
+ `(marginalia-documentation ((t (:foreground ,v/out))))
+ `(marginalia-key           ((t (:foreground ,v/main))))
+ `(marginalia-value         ((t (:foreground ,v/secondary))))
+ `(embark-keybinding        ((t (:foreground ,v/secondary))))
+ `(embark-verbose-indicator-title ((t (:foreground ,v/main :weight bold)))))
+
+;; Doom-modeline alignment to base palette
+(custom-set-faces
+ `(doom-modeline-buffer-file        ((t (:foreground ,v/foreground))))
+ `(doom-modeline-buffer-modified    ((t (:foreground ,v/secondary :weight bold))))
+ `(doom-modeline-info               ((t (:foreground ,v/main))))
+ `(doom-modeline-warning            ((t (:foreground ,v/emphasis))))
+ `(doom-modeline-project-dir        ((t (:foreground ,v/main))))
+ `(doom-modeline-buffer-major-mode  ((t (:foreground ,v/main :weight bold))))
+ `(doom-modeline-urgent             ((t (:foreground ,v/emphasis)))))
+
 ;; counsel/ivy
 (custom-set-faces
  `(ivy-current-match
