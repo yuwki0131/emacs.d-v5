@@ -17,6 +17,12 @@
 
 ;; カーソル行ハイライト
 (global-hl-line-mode t)
+;; Minibuffer はハイライトしない（入力行の背景色で見づらくなるため）
+(defun v5/minibuffer-disable-hl-line ()
+  "Disable `hl-line-mode' in the minibuffer only."
+  (when (bound-and-true-p hl-line-mode)
+    (hl-line-mode -1)))
+(add-hook 'minibuffer-setup-hook #'v5/minibuffer-disable-hl-line)
 
 ;; フリンジは0（ユーザ指定）
 (when (fboundp 'set-fringe-mode)

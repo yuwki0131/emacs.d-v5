@@ -92,7 +92,8 @@
 
 ;; Vertico/Orderless/Consult/Marginalia/Embark
 (custom-set-faces
- `(vertico-current        ((t (:background ,v/emphasis/weak :foreground ,v/main))))
+ ;; Remove background on current candidate to keep minibuffer clean
+ `(vertico-current        ((t (:background unspecified :foreground ,v/main :weight bold :underline t))))
  `(vertico-group-title    ((t (:foreground ,v/out))))
  `(vertico-group-separator((t (:foreground ,v/out))))
  `(vertico-directory      ((t (:foreground ,v/main))))
