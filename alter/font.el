@@ -3,7 +3,6 @@
 ;;;  基本フォントと絵文字/記号フォールバックの設定
 ;;; Code:
 
-(global-font-lock-mode t)
 (setq font-lock-support-mode 'jit-lock-mode)
 
 (defvar default-font-name "HackGen35 Console")

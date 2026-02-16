@@ -38,17 +38,15 @@
 (when (fboundp 'global-so-long-mode)
   (global-so-long-mode 1))
 
-;; 何らかの理由で major-mode 切替時に font-lock が無効になっていたら復帰させる
-(add-hook 'after-change-major-mode-hook
-          (lambda ()
-            (unless font-lock-mode
-              (font-lock-mode 1))
-            (when (fboundp 'font-lock-ensure)
-              (ignore-errors (font-lock-ensure)))))
-
-;; 念のため明示的に有効化（環境によっては init 途中で無効化されることがある）
+;; グローバルで font-lock を有効化（冪等）。
+;; major-mode 切替時に無効化された場合は ensure で復旧。
 (setq font-lock-global-modes t)
 (global-font-lock-mode 1)
+(add-hook 'after-change-major-mode-hook
+          (lambda ()
+            (unless font-lock-mode (font-lock-mode 1))
+            (when (fboundp 'font-lock-ensure)
+              (ignore-errors (font-lock-ensure)))))
 
 ;; バックアップ/オートセーブは不要（ユーザ指定）
 (setq auto-save-default nil

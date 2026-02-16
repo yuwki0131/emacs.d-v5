@@ -84,9 +84,9 @@
       (_ nil)))
 
   (defun v5/maybe-start-eglot ()
-    "Start Eglot if a suitable server exists and in a project."
+    "プロジェクト内かつ適切なサーバがある場合のみ Eglot を開始する。"
     (when (and (not (bound-and-true-p eglot--managed-mode))
-               (or (ignore-errors (project-current)) t))
+               (ignore-errors (project-current)))
       (let* ((m major-mode)
              (srv (v5/eglot-choose-server m)))
         (when srv

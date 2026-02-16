@@ -10,8 +10,8 @@
 
 
 ;; Ensure core completion packages are installed (refresh archives if needed)
-(when (and (not noninteractive) (>= emacs-major-version 29))
-  (require 'package-vc nil t))
+;; init.el で読み込むためここでは不要
+;; (require 'package-vc nil t)
 
 (defun v5/ensure-package (pkg &optional vc-url)
   "Install PKG if missing. If MELPA index is stale, refresh. Fallback to VC-URL when available."

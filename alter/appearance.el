@@ -42,12 +42,6 @@
 ;; 対応する括弧のハイライト / 選択の上書き
 (show-paren-mode 1)
 (delete-selection-mode 1)
-;; グローバルにシンタックスハイライトを有効化（冪等）
-(global-font-lock-mode 1)
-(add-hook 'after-init-hook (lambda () (global-font-lock-mode 1)))
-;; major-mode 切替時にも確実に有効
-(add-hook 'prog-mode-hook #'font-lock-mode)
-(add-hook 'text-mode-hook #'font-lock-mode)
 ;; 装飾レベルは最大化（端末でもできる限り色分け）
 (setq font-lock-maximum-decoration t)
 ;; 簡易デバッグ: 現在の font-lock 状態をレポート

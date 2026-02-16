@@ -8,7 +8,6 @@
 (global-unset-key "\C-a")
 (global-unset-key "\C-z")
 (global-unset-key "\C-l")
-(global-unset-key "\C-m")
 (global-unset-key "\M-m")
 (global-unset-key "\M-o")
 (global-unset-key "\C-r")
@@ -37,8 +36,9 @@
 
 ;; Functional under C-z namespace
 (bind-keys
- :prefix-map my/cz-map
+ :prefix-map v5/cz-map
  :prefix "C-z"
+ ("SPC" . set-mark-command)
  ("C-r" . replace-string)
  ("C-p" . package-install)
  ("d"   . vc-diff)
@@ -49,7 +49,7 @@
 ;; project.el shortcuts under C-z p
 (require 'project)
 (bind-keys
- :prefix-map my/cz-project-map
+ :prefix-map v5/cz-project-map
  :prefix "C-z p"
  ("f" . project-find-file)
  ("p" . project-switch-project)
