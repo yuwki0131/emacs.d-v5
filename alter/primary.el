@@ -30,7 +30,8 @@
               (marginalia . "https://github.com/minad/marginalia")
               (orderless . "https://github.com/oantolin/orderless")
               (embark . "https://github.com/oantolin/embark")
-              (embark-consult . nil)))
+              (embark-consult . nil)
+              (migemo . "https://github.com/emacs-jp/migemo")))
   (v5/ensure-package (car it) (cdr it)))
 
 (defvar v5/force-disable-icons nil 
@@ -142,6 +143,46 @@
   (completion-styles '(orderless basic))
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles basic partial-completion)))))
+
+;; Migemo: 日本語インクリメンタル検索（cmigemo がある場合のみ）
+;; - isearch だけでなく consult-line 等の Emacs 正規表現系にも統合
+(use-package migemo
+  :if (executable-find "cmigemo")
+  :init
+  (defun v5/migemo-dict-path ()
+    (seq-find #'file-exists-p
+              '("/usr/share/cmigemo/utf-8/migemo-dict"
+                "/usr/local/share/migemo/utf-8/migemo-dict"
+                "/opt/homebrew/share/migemo/utf-8/migemo-dict")))
+  :custom
+  (migemo-command "cmigemo")
+  (migemo-options '("-q" "--emacs" "-i" "\\a"))
+  (migemo-user-dictionary nil)
+  (migemo-regex-dictionary nil)
+  (migemo-coding-system 'utf-8-unix)
+  :config
+  (when-let ((dict (v5/migemo-dict-path)))
+    (setq migemo-dictionary dict)
+    (migemo-init))
+  ;; Consult の正規表現コンパイラに migemo を挟み込む（Emacs 正規表現タイプのみ）
+  (with-eval-after-load 'consult
+    (defun v5/consult-regexp-compiler-migemo (input type ignore-case)
+      (if (and (eq type 'emacs)
+               (featurep 'migemo)
+               (executable-find migemo-command)
+               (stringp migemo-dictionary)
+               (file-exists-p migemo-dictionary))
+          (let* ((parts (consult--split-escaped input))
+                 (regexps (mapcar (lambda (x)
+                                    (condition-case _
+                                        (migemo-get-pattern x)
+                                      (error x)))
+                                  parts)))
+            (cons regexps
+                  (when-let ((valid (seq-filter #'consult--valid-regexp-p regexps)))
+                    (apply-partially #'consult--highlight-regexps valid ignore-case))))
+        (consult--default-regexp-compiler input type ignore-case)))
+    (setq consult--regexp-compiler #'v5/consult-regexp-compiler-migemo)))
 
 ;; Consult: commands on top of completion
 (use-package consult
