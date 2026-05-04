@@ -29,7 +29,7 @@
 
 
 ;; 行間
-(setq line-spacing 3)
+(setq-default line-spacing 3)
 
 ;; カーソル行ハイライト
 (setq hl-line-sticky-flag t)
