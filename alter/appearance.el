@@ -4,8 +4,20 @@
 ;;; Code:
 
 ;; カーソルタイプ（GUIのみ）
+;; Prefer a thin bar cursor. Keep it compatible with TTY by using the symbol
+;; form (some terminals ignore pixel-width settings like (bar . N)).
+(setq-default cursor-type 'bar)
+(setq cursor-type 'bar)
 (when (display-graphic-p)
-  (setq-default cursor-type '(bar . 3)))
+  (setq x-stretch-cursor nil))
+
+;; 検索中もカーソル形状を変えない（環境によって box になるのを防ぐ）
+(add-hook 'isearch-mode-hook
+          (lambda ()
+            (setq cursor-type 'bar)))
+(add-hook 'minibuffer-setup-hook
+          (lambda ()
+            (setq cursor-type 'bar)))
 
 ;; フレームタイトル（プロジェクト名 + バッファ名）
 (setq frame-title-format
@@ -16,6 +28,11 @@
                (if proj (format "%s - %s" proj buf) buf))))
 
 ;; カーソル行ハイライト
+(setq hl-line-sticky-flag t)
+;; Global-Hl-Line はデフォルトだと「選択ウィンドウのみ」なので、
+;; 検索時に minibuffer を選択するとバッファ側のハイライトが消えます。
+;; これを防ぐため、グローバル版も sticky にします。
+(setq global-hl-line-sticky-flag t)
 (global-hl-line-mode t)
 ;; Minibuffer はハイライトしない（入力行の背景色で見づらくなるため）
 (defun v5/minibuffer-disable-hl-line ()

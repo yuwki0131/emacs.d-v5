@@ -23,8 +23,12 @@
 
 ;; Alt defaults
 (global-set-key "\C-x\C-f" 'find-file)
+;; Search
 (global-set-key "\C-s"     'consult-line)
 (global-set-key "\C-r"     'consult-line)
+;; Keep isearch accessible too (better persistent match highlighting).
+(global-set-key (kbd "C-M-s") 'isearch-forward)
+(global-set-key (kbd "C-M-r") 'isearch-backward)
 
 ;; Minimum
 (global-set-key "\M-o" 'other-window)

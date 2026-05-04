@@ -194,7 +194,17 @@
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
   :config
-  (setq consult-narrow-key (kbd ">")))
+  (setq consult-narrow-key (kbd ">"))
+  ;; During Consult previews (e.g. `consult-line`), upstream forces
+  ;; `cursor-in-non-selected-windows` to `box` for visibility.  This setup
+  ;; prefers a thin cursor consistently, so disable that behavior.
+  (with-eval-after-load 'consult
+    (defun v5/consult--jump-preview-no-box (orig-fn &rest args)
+      (let ((preview (apply orig-fn args)))
+        (lambda (action cand)
+          (let ((cursor-in-non-selected-windows 'box))
+            (funcall preview action cand)))))
+    (advice-add 'consult--jump-preview :around #'v5/consult--jump-preview-no-box)))
 
 ;; Embark: contextual actions
 (use-package embark

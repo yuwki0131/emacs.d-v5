@@ -37,14 +37,16 @@
 ;; Load modular configs (ported from v4)
 (add-to-list 'load-path (expand-file-name "alter" user-emacs-directory))
 
+;; Load `custom.el` early so our modular configs can override faces/vars.
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file 'noerror 'nomessage))
+
 (require 'font)
 (require 'safety)
 (require 'xolor)
 (require 'builtin)
 (require 'appearance)
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(when (file-exists-p custom-file)
-  (load custom-file 'noerror 'nomessage))
 (require 'primary)
 (require 'secondary)
 (require 'lang)

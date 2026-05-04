@@ -56,7 +56,11 @@
 (set-face-attribute 'region nil :background v/emphasis/weak)
 
 ;; Current line
-(custom-set-faces `(hl-line ((t (:background ,v/focus)))))
+(custom-set-faces
+ ;; Keep current line visible but not too loud.
+ ;; Avoid passing nil to face attributes.
+ `(hl-line
+   ((t (:background ,v/focus :underline ,v/out-strong)))))
 
 ;; Cursor
 (set-cursor-color v/emphasis)
@@ -101,13 +105,25 @@
  `(orderless-match-face-1 ((t (:foreground ,v/secondary   :weight bold))))
  `(orderless-match-face-2 ((t (:foreground ,v/emphasis    :weight bold))))
  `(orderless-match-face-3 ((t (:foreground ,v/string-like :weight bold))))
- `(consult-preview-match  ((t (:background ,v/emphasis/weak))))
+ ;; Highlight matches in the *buffer* during Consult preview.
+ ;; (e.g. `consult-line' bound to C-s/C-r in alter/key.el)
+ `(consult-preview-match  ((t (:background ,v/focus :foreground ,v/emphasis :weight bold))))
+ ;; Selected candidate line during Consult preview (subtle).
+ `(consult-preview-line   ((t (:background ,v/focus))))
  `(consult-highlight      ((t (:foreground ,v/emphasis    :weight bold))))
  `(marginalia-documentation ((t (:foreground ,v/out))))
  `(marginalia-key           ((t (:foreground ,v/main))))
  `(marginalia-value         ((t (:foreground ,v/secondary))))
  `(embark-keybinding        ((t (:foreground ,v/secondary))))
  `(embark-verbose-indicator-title ((t (:foreground ,v/main :weight bold)))))
+
+;; Search (isearch / occur etc.)
+(custom-set-faces
+ ;; Active match (cursor on it)
+ `(isearch ((t (:background ,v/focus :foreground ,v/foreground :weight bold))))
+ ;; Other matches
+ `(lazy-highlight ((t (:background ,v/focus :foreground ,v/out-strong))))
+ `(isearch-fail ((t (:background ,v/focus :foreground ,v/emphasis :weight bold)))))
 
 ;; Doom-modeline alignment to base palette
 (custom-set-faces
