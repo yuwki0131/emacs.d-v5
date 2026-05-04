@@ -27,6 +27,10 @@
                       (buf  (buffer-name)))
                (if proj (format "%s - %s" proj buf) buf))))
 
+
+;; 行間
+(setq line-spacing 3)
+
 ;; カーソル行ハイライト
 (setq hl-line-sticky-flag t)
 ;; Global-Hl-Line はデフォルトだと「選択ウィンドウのみ」なので、
